@@ -1,0 +1,90 @@
+
+d=linspace(80,150,15);
+for (i=1:length(d))
+{
+#左旋
+addplane;
+set("name","Source-Ey");
+set("injection axis","z");
+set("direction","backward");
+set("phase",90);
+set("x",0);
+set("x span",800e-9);
+set("y",0);
+set("y span",800e-9);
+set("z",120e-9);
+set("wavelength start",380e-9);
+set("wavelength stop",800e-9);
+addrect;
+set("name","Bottom");
+set("x",0);
+set("x span",50e-9);
+p1=d(i);
+p2=p1*0.000000001;
+set("y",0);
+set("y span",p2);
+set("z",-50e-9);
+set("z span",50e-9);
+set("material", "Al (Aluminium) - Palik");
+addrect;
+set("name","Top");
+set("x min",-25e-9);
+set("x max",-25e-9+p2);
+set("y min",p2/2-(50e-9));
+set("y max",p2/2);
+set("z min",5e-9);
+set("z max",55e-9);
+set("material", "Al (Aluminium) - Palik");  
+run;
+T=transmission('T');
+f=getdata('T','f');
+lam = c/f*1e9;
+x=matrix(200,2);
+for (i1=1:200)
+{x(i1,1)=lam(i1);
+x(i1,2)=-T(i1);
+}
+cd("E:\Al\left");
+filename="Reflectance_"+num2str(d(i))+"_A1"+"_A1"+"_left"+".txt";
+write(filename,num2str(x));
+switchtolayout;   #退出仿真模式
+#右旋
+select("Source-Ey");
+delete;
+addplane;
+set("name","Source-Ey");
+set("injection axis","z");
+set("direction","backward");
+set("phase",-90);
+set("x",0);
+set("x span",800e-9);
+set("y",0);
+set("y span",800e-9);
+set("z",120e-9);
+set("wavelength start",380e-9);
+set("wavelength stop",800e-9);
+run;
+T=transmission('T');
+f=getdata('T','f');
+lam = c/f*1e9;
+y=matrix(200,2);
+for (i2=1:200)
+{y(i2,1)=lam(i2);
+y(i2,2)=-T(i2);
+}
+cd("E:\Al\right");
+filename="Reflectance_"+num2str(d(i))+"_A1"+"_A1"+"_right"+".txt";
+write(filename,num2str(y));
+switchtolayout;   #退出仿真模式
+select("Source-Ey");
+delete;
+select("Top");
+delete;
+select("Bottom");
+delete;
+}
+
+
+
+
+
