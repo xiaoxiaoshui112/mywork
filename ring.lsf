@@ -1,0 +1,101 @@
+
+
+d=linspace(80,150,8);
+for (i=1:length(d))
+
+{
+#左旋
+addtfsf;
+set("name","Source-Ey");
+set("injection axis","z");
+set("direction","backward");
+set("phase",90);
+set("polarization angle",90);
+set("x",0);
+set("x span",545e-9);
+set("y",0);
+set("y span",545e-9);
+set("z",0);
+set("z span",400e-9);
+set("override global source settings",0);
+addring;
+set("name","Top");
+set("x",0);
+set("y",0);
+p1=d(i);
+?p1;
+set("z min",30e-9);
+set("z max",70e-9);
+set("theta start",0);
+set("theta stop",p1);
+set("inner radius",80e-9);
+set("outer radius",150e-9);
+set("material", "Al (Aluminium) - Palik");
+
+for (j=1:length(d))
+{addring;
+set("name","Bottom");
+set("x",0);
+set("y",0);
+p2=d(j);
+?p2;
+set("z min",-70e-9);
+set("z max",-30e-9);
+set("theta start",p1);
+set("theta stop",p2+p1);
+set("inner radius",80e-9);
+set("outer radius",150e-9);
+set("material", "Al (Aluminium) - Palik");
+run;
+T=transmission('T');
+f=getdata('T','f');
+lam = c/f*1e9;
+x=matrix(500,2);
+for (i1=1:500)
+{x(i1,1)=lam(i1);
+x(i1,2)=1+T(i1);
+}
+cd("E:\Ring\left");
+filename="T_left_Top_"+num2str(d(i))+"_Bottom_"+num2str(d(j))+"_A1"+"_Al"+".txt";
+write(filename,num2str(x));
+switchtolayout;   #退出仿真模式
+select("Source-Ey");
+delete;
+#右旋
+addtfsf;
+set("name","Source-Ey");
+set("injection axis","z");
+set("direction","backward");
+set("phase",-90);
+set("polarization angle",90);
+set("x",0);
+set("x span",545e-9);
+set("y",0);
+set("y span",545e-9);
+set("z",0);
+set("z span",400e-9);
+set("override global source settings",0);
+run;
+T=transmission('T');
+f=getdata('T','f');
+lam = c/f*1e9;
+y=matrix(500,2);
+for (i2=1:500)
+{y(i2,1)=lam(i2);
+y(i2,2)=1+T(i2);
+}
+cd("E:\Ring\right");
+filename="T_right_Top_"+num2str(d(i))+"_Bottom_"+num2str(d(j))+"_A1"+"_Al"+".txt";
+write(filename,num2str(y));
+switchtolayout;   #退出仿真模式
+select("Source-Ey");
+delete;
+select("Bottom");
+delete;
+
+}
+
+select("Top");
+delete;
+}
+
